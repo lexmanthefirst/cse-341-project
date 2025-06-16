@@ -26,11 +26,10 @@ app.use(
       secure: process.env.NODE_ENV === 'production', // HTTPS only in production
       httpOnly: true, // Prevent client-side JS access
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
     },
   }),
 );
-
+app.set('trust proxy', 1); // Trust first proxy for secure cookies in production
 // Passport Setup
 app.use(passport.initialize());
 app.use(passport.session());
@@ -38,7 +37,12 @@ app.use(passport.session());
 // Body Parsers and CORS
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: 'https://cse-341-project-m8mw.onrender.com',
+    credentials: true,
+  }),
+);
 
 // Routes
 app.use('/api', routes);
