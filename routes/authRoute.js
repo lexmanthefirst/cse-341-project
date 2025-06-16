@@ -13,13 +13,16 @@ const passport = require('passport');
  * @swagger
  * /auth/google:
  *   get:
- *     summary: Redirect to Google OAuth login
- *     tags: [Authentication]
- *     description: Redirects user to Google's OAuth consent screen
+ *     tags: [Auth]
+ *     summary: Login with Google (OAuth2)
+ *     description: Initiates Google OAuth2 flow
+ *     security:
+ *       - GoogleOAuth: []  # Reference the security scheme
  *     responses:
  *       302:
- *         description: Redirect to Google OAuth consent screen
+ *         description: Redirects to Google for authentication
  */
+//login with Google
 router.get(
   '/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }),
@@ -29,13 +32,20 @@ router.get(
  * @swagger
  * /auth/google/callback:
  *   get:
- *     summary: Google OAuth2 callback
- *     tags: [Authentication]
+ *     tags: [Auth]
+ *     summary: Google OAuth2 Callback
  *     description: Handles the OAuth2 callback from Google
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         schema:
+ *           type: string
+ *         description: Authorization code from Google
  *     responses:
  *       302:
- *         description: Redirect on success or failure
+ *         description: Redirects to homepage on success
  */
+// Google OAuth callback
 router.get(
   '/google/callback',
   passport.authenticate('google', {
@@ -45,37 +55,9 @@ router.get(
   (req, res) => {
     // Store user in session manually for custom use
     req.session.user = req.user;
-    res.redirect('/auth/success');
+    res.redirect('/');
   },
 );
-
-/**
- * @swagger
- * /auth/success:
- *   get:
- *     summary: Auth success
- *     tags: [Authentication]
- *     description: Returns authenticated user info
- *     responses:
- *       200:
- *         description: Authenticated
- *       401:
- *         description: Not authenticated
- */
-router.get('/auth/success', (req, res) => {
-  if (req.isAuthenticated()) {
-    res.status(200).json({
-      success: true,
-      message: 'Authentication successful',
-      user: req.user,
-    });
-  } else {
-    res.status(401).json({
-      success: false,
-      message: 'User not authenticated',
-    });
-  }
-});
 
 /**
  * @swagger
