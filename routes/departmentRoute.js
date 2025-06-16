@@ -4,7 +4,7 @@ const departmentController = require('../controllers/departmentController');
 const departmentValidator = require('../utilities/departmentValidator');
 const Util = require('../utilities');
 const authenticateUser = require('../middleware/authMiddleware');
-const authorizeRoles = require('../middleware/authorizeRolesMiddleware');
+const authorizeRoles = require('../middleware/authoRole');
 
 /**
  * @swagger
