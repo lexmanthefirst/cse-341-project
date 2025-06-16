@@ -10,11 +10,10 @@ require('./config/passport');
 
 const app = express();
 
-// Trust proxy if you're on Render or behind a reverse proxy
 app.set('trust proxy', 1);
 
 // Middleware
-app.use(passport.initialize()); // No session middleware
+app.use(passport.initialize());
 
 // Body Parsers
 app.use(express.json());
@@ -28,7 +27,7 @@ app.use(
   }),
 );
 
-// Base Route (optional)
+// Base Route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
