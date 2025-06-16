@@ -187,6 +187,7 @@ router.put(
 router.patch(
   '/:id/withdraw',
   authenticateUser,
+  authorizeRoles('admin'),
   Util.handleErrors(enrollmentController.withdrawStudent),
 );
 

@@ -77,7 +77,18 @@ const createUser = async (req, res) => {
       });
     }
 
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
+
+    // Assign role based on domain
+    const domain = email.split('@')[1].toLowerCase();
+    let role = 'student'; // Default
+
+    if (['staff.school.com', 'teachers.school.com'].includes(domain)) {
+      role = 'staff';
+    } else if (['admin.school.com', 'superadmin.school.com'].includes(domain)) {
+      role = 'admin';
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       name,
@@ -85,6 +96,7 @@ const createUser = async (req, res) => {
       password: hashedPassword,
       role,
     };
+
     const saved = await User.create(newUser);
 
     res.status(201).json({

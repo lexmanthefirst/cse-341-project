@@ -25,6 +25,7 @@ const userSchema = new Schema(
     role: {
       type: String,
       enum: ['student', 'staff', 'admin'],
+      default: 'student',
       required: true,
     },
     isActive: {
@@ -37,7 +38,7 @@ const userSchema = new Schema(
     provider: {
       type: String,
       enum: ['local', 'google'],
-      default: 'local',
+      default: 'google',
     },
   },
   { timestamps: true },

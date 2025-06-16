@@ -4,7 +4,7 @@ const classGroupController = require('../controllers/classController');
 const classValidator = require('../utilities/classValidator');
 const Util = require('../utilities');
 const authenticateUser = require('../middleware/authMiddleware');
-const authorizeRoles = require('../middleware/authRole');
+// const authorizeRoles = require('../middleware/authRole');
 
 /**
  * @swagger
@@ -31,7 +31,6 @@ const authorizeRoles = require('../middleware/authRole');
 router.post(
   '/',
   authenticateUser,
-  authorizeRoles('admin'),
   classValidator.classGroupValidationRules(),
   classValidator.validateRequest,
   Util.handleErrors(classGroupController.createClassGroup),
@@ -121,7 +120,6 @@ router.get('/:id', Util.handleErrors(classGroupController.getClassGroup));
 router.put(
   '/:id',
   authenticateUser,
-  authorizeRoles('admin'),
   classValidator.classGroupValidationRules(),
   classValidator.validateRequest,
   Util.handleErrors(classGroupController.updateClassGroup),
@@ -149,7 +147,6 @@ router.put(
 router.delete(
   '/:id',
   authenticateUser,
-  authorizeRoles('admin'),
   Util.handleErrors(classGroupController.deleteClassGroup),
 );
 

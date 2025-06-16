@@ -4,7 +4,6 @@ const userController = require('../controllers/userController');
 const userValidator = require('../utilities/userValidator');
 const Util = require('../utilities');
 const authenticateUser = require('../middleware/authMiddleware');
-const authorizeRoles = require('../middleware/authRole');
 
 /**
  * @swagger
@@ -175,7 +174,6 @@ router.put(
 router.delete(
   '/:id',
   authenticateUser,
-  authorizeRoles('admin'),
   Util.handleErrors(userController.deleteUser),
 );
 

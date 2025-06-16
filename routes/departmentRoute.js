@@ -31,7 +31,6 @@ const authorizeRoles = require('../middleware/authRole');
 router.post(
   '/',
   authenticateUser,
-  authorizeRoles('admin'),
   departmentValidator.departmentValidationRules(),
   departmentValidator.validateRequest,
   Util.handleErrors(departmentController.createDepartment),
