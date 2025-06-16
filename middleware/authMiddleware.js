@@ -1,7 +1,8 @@
 const isAuthenticated = (req, res, next) => {
-  if (req.session.user === undefined) {
-    res.status(401).json({ message: 'Not authenticated' });
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'Not authenticated' });
   }
+  req.user = req.session.user; // Ensure user is attached to req
   next();
 };
 
@@ -18,6 +19,7 @@ module.exports = {
   isAuthenticated,
   authorizeRoles,
 };
+
 // exports.isAdmin = (req, res, next) => {
 //   if (req.user && req.user.role === 'admin') return next();
 //   res.status(403).json({ message: 'Access denied' });
