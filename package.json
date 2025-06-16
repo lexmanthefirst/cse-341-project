@@ -1,0 +1,44 @@
+{
+  "name": "school_management_api",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "swagger-autogen": "node swagger-autogen.js",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
+  },
+  "keywords": [],
+  "author": "team 5",
+  "license": "ISC",
+  "description": "The School Management API will provide a comprehensive backend system for managing essential data within a school environment",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
+    "express-session": "^1.18.1",
+    "express-validator": "^7.2.1",
+    "js-yaml": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.17.0",
+    "mongoose": "^8.15.2",
+    "nodemon": "^3.1.10",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-jwt": "^4.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
+  "devDependencies": {
+    "@shelf/jest-mongodb": "^5.2.2",
+    "@types/supertest": "^6.0.3",
+    "cross-env": "^7.0.3",
+    "jest": "^30.0.0",
+    "supertest": "^7.1.1"
+  }
+}
