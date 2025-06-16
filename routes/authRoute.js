@@ -30,9 +30,15 @@ router.get(
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: '/auth/failure',
-    successRedirect: '/auth/success',
+    failureRedirect: '/api-docs',
+    successRedirect: '/success',
+    session: true,
   }),
+  (req, res) => {
+    // Successful authentication, redirect home or to a specific page
+    req.session.user = req.user; // Store user info in session
+    res.redirect('/');
+  },
 );
 
 // @desc: Auth success route
@@ -72,6 +78,7 @@ router.get('/logout', (req, res) => {
     req.session.destroy(() => {
       res.clearCookie('connect.sid');
       res.json({ message: 'Logged out successfully' });
+      res.redirect('/');
     });
   });
 });
