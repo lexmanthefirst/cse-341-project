@@ -41,7 +41,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // Routes
-app.use('/auth', authRoutes);
 app.use('/api', routes);
 
 // Swagger

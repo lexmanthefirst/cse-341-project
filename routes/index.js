@@ -7,6 +7,18 @@ const enrollmentRoute = require('./enrollmentRoute');
 const authRoute = require('./authRoute');
 
 router.get('/', (req, res) => {
+  if (req.user) {
+    console.log(
+      `User ${
+        req.user.username ||
+        req.user.email ||
+        req.user.name ||
+        req.user.displayName
+      } is logged in as ${req.user.role}`,
+    );
+  } else {
+    console.log('No user is logged in');
+  }
   res.send('Welcome to the School Management Api');
 });
 

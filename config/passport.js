@@ -55,61 +55,49 @@ passport.use(
   }),
 );
 
-/**
- * Google OAuth2 Strategy
- */
+// Google OAuth Strategy
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL:
-        process.env.GOOGLE_CALLBACK_URL ||
-        'http://localhost:3000/auth/google/callback',
-      passReqToCallback: true,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
-    async (req, accessToken, refreshToken, profile, done) => {
+    async (accessToken, refreshToken, profile, done) => {
       try {
-        const googleId = profile.id;
-        const email = profile.emails?.[0]?.value;
-        const avatar = profile.photos?.[0]?.value || '';
-        const displayName = profile.displayName;
+        const email =
+          profile.emails?.[0]?.value || `google-${profile.id}@placeholder.com`;
+        const domain = email.split('@')[1] || '';
 
-        if (!email) {
-          return done(
-            new Error('Google profile does not contain an email'),
-            false,
-          );
-        }
-
-        let user = await User.findOne({ googleId });
-
-        if (user) {
-          return done(null, user);
-        }
-
-        // Assign role based on email domain
-        const domain = email.split('@')[1];
-        let role = 'student';
-
+        let role = 'student'; // default role
         if (domain === 'staff.school.com') {
           role = 'teacher';
         } else if (domain === 'admin.school.com') {
           role = 'admin';
         }
 
-        const newUser = new User({
-          googleId,
-          email,
-          name: displayName,
-          avatar,
-          role,
-        });
+        let user = await User.findOne({ googleId: profile.id });
 
-        const savedUser = await newUser.save();
-        return done(null, savedUser);
-      } catch (err) {
-        return done(err);
+        if (!user) {
+          user = await User.create({
+            googleId: profile.id,
+            name: profile.displayName,
+            email,
+            role,
+            provider: 'google',
+          });
+          console.log(
+            'New Google user created:',
+            user.name,
+            '| Role:',
+            user.role,
+          );
+        }
+
+        return done(null, user);
+      } catch (error) {
+        console.error('Google OAuth error:', error);
+        return done(error, null);
       }
     },
   ),

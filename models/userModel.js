@@ -34,6 +34,11 @@ const userSchema = new Schema(
     avatar: {
       type: String,
     },
+    provider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
   },
   { timestamps: true },
 );

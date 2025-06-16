@@ -29,10 +29,18 @@ module.exports = {
       description: 'User role',
       example: 'student',
     },
-    refId: {
+    googleId: {
       type: 'string',
-      description: 'Reference ID to role-specific document',
-      example: '60f6e9f2b7a1c142d8ef8c00',
+      description: 'Google OAuth ID (if authenticated via Google)',
+      example: '10987654321',
+      nullable: true,
+    },
+    provider: {
+      type: 'string',
+      enum: ['local', 'google'],
+      description: 'Authentication provider',
+      example: 'local',
+      default: 'google',
     },
     isActive: {
       type: 'boolean',
@@ -50,5 +58,5 @@ module.exports = {
       readOnly: true,
     },
   },
-  required: ['name', 'email', 'password', 'role', 'refId'],
+  required: ['name', 'email', 'password', 'role'],
 };
