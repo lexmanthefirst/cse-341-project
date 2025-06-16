@@ -84,6 +84,7 @@ passport.use(
             name: profile.displayName,
             email,
             role,
+            avatar: profile.photos?.[0]?.value || '',
             provider: 'google',
           });
           console.log(
