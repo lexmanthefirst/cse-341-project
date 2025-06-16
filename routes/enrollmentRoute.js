@@ -7,16 +7,13 @@ const {
   validateRequest,
 } = require('../utilities/enrollmentValidator');
 const Util = require('../utilities');
-const {
-  isAuthenticated,
-  authorizeRoles,
-} = require('../middleware/authMiddleware');
+const authenticateUser = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/authRole');
 
 /**
  * @swagger
  * tags:
  *   name: Enrollment
- *   description: API for managing student enrollments
  */
 
 /**
@@ -45,8 +42,7 @@ const {
  */
 router.post(
   '/',
-  isAuthenticated,
-  authorizeRoles('admin'),
+  authenticateUser,
   enrollmentValidationRules(),
   validateRequest,
   Util.handleErrors(enrollmentController.enrollStudent),
@@ -163,8 +159,7 @@ router.get(
  */
 router.put(
   '/:id',
-  isAuthenticated,
-  authorizeRoles('admin'),
+  authenticateUser,
   enrollmentValidationRules(),
   validateRequest,
   Util.handleErrors(enrollmentController.updateEnrollment),
@@ -191,8 +186,7 @@ router.put(
  */
 router.patch(
   '/:id/withdraw',
-  isAuthenticated,
-  authorizeRoles('admin'),
+  authenticateUser,
   Util.handleErrors(enrollmentController.withdrawStudent),
 );
 

@@ -3,10 +3,7 @@ const router = express.Router();
 const departmentController = require('../controllers/departmentController');
 const departmentValidator = require('../utilities/departmentValidator');
 const Util = require('../utilities');
-const {
-  isAuthenticated,
-  authorizeRoles,
-} = require('../middleware/authMiddleware');
+const authenticateUser = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -32,7 +29,7 @@ const {
  */
 router.post(
   '/',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   departmentValidator.departmentValidationRules(),
   departmentValidator.validateRequest,
@@ -122,8 +119,7 @@ router.get('/:id', Util.handleErrors(departmentController.getDepartment));
  */
 router.put(
   '/:id',
-  isAuthenticated,
-  authorizeRoles('admin'),
+  authenticateUser,
   departmentValidator.departmentValidationRules(),
   departmentValidator.validateRequest,
   Util.handleErrors(departmentController.updateDepartment),
@@ -150,8 +146,7 @@ router.put(
  */
 router.delete(
   '/:id',
-  isAuthenticated,
-  authorizeRoles('admin'),
+  authenticateUser,
   Util.handleErrors(departmentController.deleteDepartment),
 );
 

@@ -3,10 +3,8 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const userValidator = require('../utilities/userValidator');
 const Util = require('../utilities');
-const {
-  isAuthenticated,
-  authorizeRoles,
-} = require('../middleware/authMiddleware');
+const authenticateUser = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/authRole');
 
 const authController = require('../controllers/authController');
 
@@ -14,7 +12,6 @@ const authController = require('../controllers/authController');
  * @swagger
  * /user:
  *   post:
- *     summary: Create a new user
  *     tags: [User]
  *     requestBody:
  *       required: true
@@ -34,86 +31,10 @@ const authController = require('../controllers/authController');
  */
 router.post(
   '/',
-  isAuthenticated,
-  authorizeRoles('admin'),
+  authenticateUser,
   userValidator.userValidationRules(),
   userValidator.validateRequest,
   Util.handleErrors(userController.createUser),
-);
-
-/**
- * @swagger
- * /user/signup:
- *   post:
- *     summary: Register a new user and get a JWT token
- *     tags: [User]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *               - role
- *             properties:
- *               name:
- *                 type: string
- *                 example: Alex Okhitoya
- *               email:
- *                 type: string
- *                 format: email
- *                 example: alex@school.com
- *               password:
- *                 type: string
- *                 format: password
- *                 example: secret123
- *               role:
- *                 type: string
- *                 enum: [admin, teacher, student]
- *                 example: student
- *     responses:
- *       201:
- *         description: User registered successfully and JWT token returned
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 token:
- *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: 60e7a2a5b5e4c24d88e2f776
- *                     name:
- *                       type: string
- *                       example: Alex Okhitoya
- *                     email:
- *                       type: string
- *                       example: alex@school.com
- *                     role:
- *                       type: string
- *                       example: student
- *       400:
- *         description: User already exists or validation failed
- *       500:
- *         description: Server error during signup
- */
-
-router.post(
-  '/signup',
-  userValidator.userValidationRules(),
-  userValidator.validateRequest,
-  Util.handleErrors(authController.signup),
 );
 
 /**
@@ -164,7 +85,11 @@ router.get('/', Util.handleErrors(userController.getAllUsers));
  *       404:
  *         description: User not found
  */
-router.get('/email/:email', Util.handleErrors(userController.getUserByEmail));
+router.get(
+  '/email/:email',
+  authenticateUser,
+  Util.handleErrors(userController.getUserByEmail),
+);
 
 /**
  * @swagger
@@ -224,8 +149,7 @@ router.get('/:id', Util.handleErrors(userController.getUserById));
  */
 router.put(
   '/:id',
-  isAuthenticated,
-  authorizeRoles('admin'),
+  authenticateUser,
   userValidator.userValidationRules(),
   userValidator.validateRequest,
   Util.handleErrors(userController.updateUser),
@@ -252,7 +176,7 @@ router.put(
  */
 router.delete(
   '/:id',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   Util.handleErrors(userController.deleteUser),
 );

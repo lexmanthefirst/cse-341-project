@@ -3,10 +3,8 @@ const router = express.Router();
 const courseController = require('../controllers/courseController');
 const courseValidator = require('../utilities/courseValidator');
 const Util = require('../utilities');
-const {
-  isAuthenticated,
-  authorizeRoles,
-} = require('../middleware/authMiddleware');
+const authenticateUser = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/authRole');
 
 /**
  * @swagger
@@ -39,7 +37,7 @@ const {
  */
 router.post(
   '/',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   courseValidator.courseValidationRules(),
   courseValidator.validateRequest,
@@ -122,7 +120,7 @@ router.get('/:id', Util.handleErrors(courseController.getCourse));
  */
 router.put(
   '/:id',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   courseValidator.courseValidationRules(),
   courseValidator.validateRequest,
@@ -150,7 +148,7 @@ router.put(
  */
 router.delete(
   '/:id',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   Util.handleErrors(courseController.deleteCourse),
 );

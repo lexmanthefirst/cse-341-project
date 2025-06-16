@@ -1,30 +1,27 @@
-const isAuthenticated = (req, res, next) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: 'Not authenticated' });
+const jwt = require('jsonwebtoken');
+const { isBlacklisted } = require('../utilities/tokenBlacklist');
+
+const authenticateUser = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided' });
   }
-  req.user = req.session.user; // Ensure user is attached to req
-  next();
-};
 
-const authorizeRoles = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Forbidden' });
-    }
+  const token = authHeader.split(' ')[1];
+
+  const blacklisted = await isBlacklisted(token);
+  if (blacklisted) {
+    return res.status(401).json({ message: 'Token has been revoked' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
     next();
-  };
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
 };
 
-module.exports = {
-  isAuthenticated,
-  authorizeRoles,
-};
-
-// exports.isAdmin = (req, res, next) => {
-//   if (req.user && req.user.role === 'admin') return next();
-//   res.status(403).json({ message: 'Access denied' });
-// };
-// exports.isUser = (req, res, next) => {
-//   if (req.user && req.user.role === 'user') return next();
-//   res.status(403).json({ message: 'Access denied' });
-// };
+module.exports = authenticateUser;

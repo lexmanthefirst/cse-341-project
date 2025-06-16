@@ -3,10 +3,8 @@ const router = new express.Router();
 const classGroupController = require('../controllers/classController');
 const classValidator = require('../utilities/classValidator');
 const Util = require('../utilities');
-const {
-  isAuthenticated,
-  authorizeRoles,
-} = require('../middleware/authMiddleware');
+const authenticateUser = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/authRole');
 
 /**
  * @swagger
@@ -32,7 +30,7 @@ const {
  */
 router.post(
   '/',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   classValidator.classGroupValidationRules(),
   classValidator.validateRequest,
@@ -122,7 +120,7 @@ router.get('/:id', Util.handleErrors(classGroupController.getClassGroup));
  */
 router.put(
   '/:id',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   classValidator.classGroupValidationRules(),
   classValidator.validateRequest,
@@ -150,7 +148,7 @@ router.put(
  */
 router.delete(
   '/:id',
-  isAuthenticated,
+  authenticateUser,
   authorizeRoles('admin'),
   Util.handleErrors(classGroupController.deleteClassGroup),
 );
