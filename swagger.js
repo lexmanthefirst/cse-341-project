@@ -24,7 +24,7 @@ const options = {
     },
     servers: [
       {
-        url: 'https://cse-341-group-project-mfvd.onrender.com/api',
+        url: 'https://cse-341-project-m8mw.onrender.com/api',
         description: 'Production server',
       },
       {
@@ -38,8 +38,10 @@ const options = {
           type: 'oauth2',
           flows: {
             authorizationCode: {
-              authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
-              tokenUrl: 'https://oauth2.googleapis.com/token',
+              authorizationUrl:
+                'https://cse-341-project-m8mw.onrender.com/api/auth/google',
+              tokenUrl:
+                'https://cse-341-project-m8mw.onrender.com/api/auth/google/callback',
               scopes: {
                 openid: 'OpenID access',
                 profile: 'View your profile info',
@@ -101,10 +103,8 @@ module.exports = app => {
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
           scopes: ['openid', 'profile', 'email'],
           usePkceWithAuthorizationCodeGrant: true,
-          redirectUri: `${
-            process.env.API_BASE_URL ||
-            'https://cse-341-group-project-mfvd.onrender.com'
-          }/api-docs/oauth2-redirect.html`,
+          redirectUri:
+            'https://cse-341-project-m8mw.onrender.com/api/auth/google/callback',
         },
         persistAuthorization: true,
       },

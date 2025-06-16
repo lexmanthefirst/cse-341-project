@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: API for school admin storage and management
 servers:
-  - url: https://cse-341-group-project-mfvd.onrender.com/api
+  - url: https://cse-341-project-m8mw.onrender.com/api
     description: Production server
   - url: http://localhost:5500/api
     description: Local development server
@@ -14,8 +14,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth
-          tokenUrl: https://oauth2.googleapis.com/token
+          authorizationUrl: https://cse-341-project-m8mw.onrender.com/api/auth/google
+          tokenUrl: https://cse-341-project-m8mw.onrender.com/api/auth/google/callback
           scopes:
             openid: OpenID access
             profile: View your profile info
