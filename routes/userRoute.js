@@ -6,8 +6,6 @@ const Util = require('../utilities');
 const authenticateUser = require('../middleware/authMiddleware');
 const authorizeRoles = require('../middleware/authRole');
 
-const authController = require('../controllers/authController');
-
 /**
  * @swagger
  * /user:

@@ -6,48 +6,51 @@ const { addToBlacklist } = require('../utilities/tokenBlacklist');
 
 /**
  * @swagger
- * tags:
- *   name: Authentication
- *   description: API for user authentication
- */
-
-/**
- * @swagger
  * /auth/google:
  *   get:
- *     tags: [Auth]
- *     summary: Login with Google (OAuth2)
- *     description: Initiates Google OAuth2 flow
+ *     summary: Initiate Google OAuth2 login
+ *     tags: [Authentication]
+ *     description: Redirects the user to Google's OAuth2 authorization page.
  *     security:
- *       - GoogleOAuth: []  # Reference the security scheme
+ *       - googleOAuth: []
  *     responses:
  *       302:
- *         description: Redirects to Google for authentication
+ *         description: Redirect to Google OAuth2
  */
-//login with Google
 router.get(
   '/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }),
 );
-
 /**
  * @swagger
  * /auth/google/callback:
  *   get:
- *     tags: [Auth]
- *     summary: Google OAuth2 Callback
- *     description: Handles the OAuth2 callback from Google
+ *     summary: Google OAuth2 callback
+ *     tags: [Authentication]
+ *     description: Handles the callback from Google and returns a JWT
  *     parameters:
  *       - in: query
  *         name: code
  *         schema:
  *           type: string
+ *         required: true
  *         description: Authorization code from Google
  *     responses:
- *       302:
- *         description: Redirects to homepage on success
+ *       200:
+ *         description: Authentication successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                 token:
+ *                   type: string
  */
-// Google OAuth callback
+
 router.get(
   '/google/callback',
   passport.authenticate('google', { session: false }),
@@ -56,7 +59,6 @@ router.get(
       return next();
     }
 
-    // Send token to client
     res.status(200).json({
       message: 'Authentication successful',
       user: req.user.user,
@@ -68,13 +70,24 @@ router.get(
 /**
  * @swagger
  * /auth/logout:
- *   get:
+ *   post:
  *     summary: Logout user
  *     tags: [Authentication]
- *     description: Clears the session and logs the user out
+ *     description: Invalidates the JWT token by adding it to a blacklist
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully logged out
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized or token already revoked
  */
 router.post('/logout', authenticateUser, async (req, res) => {
   const authHeader = req.headers.authorization;

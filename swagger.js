@@ -64,11 +64,7 @@ const options = {
         enrollment: enrollmentSchema,
       },
     },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
+    security: [{ bearerAuth: [] }, { googleOAuth: [] }],
   },
   apis: ['./routes/*.js'],
 };

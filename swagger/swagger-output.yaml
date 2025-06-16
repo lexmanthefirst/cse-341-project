@@ -208,39 +208,66 @@ components:
         - course
 security:
   - bearerAuth: []
+  - googleOAuth: []
 paths:
   /auth/google:
     get:
-      summary: Redirect to Google OAuth login
+      summary: Initiate Google OAuth2 login
       tags:
         - Authentication
-      description: Redirects user to Google's OAuth consent screen
+      description: Redirects the user to Google's OAuth2 authorization page.
+      security:
+        - googleOAuth: []
       responses:
         '302':
-          description: Redirect to Google OAuth consent screen
-  /auth/logout:
+          description: Redirect to Google OAuth2
+  /auth/google/callback:
     get:
+      summary: Google OAuth2 callback
+      tags:
+        - Authentication
+      description: Handles the callback from Google and returns a JWT
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Authorization code from Google
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    type: object
+                  token:
+                    type: string
+  /auth/logout:
+    post:
       summary: Logout user
       tags:
         - Authentication
-      description: Clears the session and invalidates the JWT token
-      responses:
-        '302':
-          description: Redirect to success page
-        '401':
-          description: User not authenticated
-  /user/protected:
-    get:
-      summary: Test protected route with JWT
+      description: Invalidates the JWT token by adding it to a blacklist
       security:
         - bearerAuth: []
-      tags:
-        - User
       responses:
         '200':
-          description: Authorized user access
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         '401':
-          description: Unauthorized
+          description: Unauthorized or token already revoked
   /class:
     post:
       summary: Create a new class
@@ -666,7 +693,6 @@ paths:
           description: Enrollment not found
   /user:
     post:
-      summary: Create a new user
       tags:
         - User
       requestBody:
@@ -697,74 +723,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/user'
-  /user/signup:
-    post:
-      summary: Register a new user and get a JWT token
-      tags:
-        - User
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - email
-                - password
-                - role
-              properties:
-                name:
-                  type: string
-                  example: Alex Okhitoya
-                email:
-                  type: string
-                  format: email
-                  example: alex@school.com
-                password:
-                  type: string
-                  format: password
-                  example: secret123
-                role:
-                  type: string
-                  enum:
-                    - admin
-                    - teacher
-                    - student
-                  example: student
-      responses:
-        '201':
-          description: User registered successfully and JWT token returned
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  token:
-                    type: string
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: 60e7a2a5b5e4c24d88e2f776
-                      name:
-                        type: string
-                        example: Alex Okhitoya
-                      email:
-                        type: string
-                        example: alex@school.com
-                      role:
-                        type: string
-                        example: student
-        '400':
-          description: User already exists or validation failed
-        '500':
-          description: Server error during signup
   /user/{email}:
     get:
       summary: Get a user by email
@@ -852,8 +810,6 @@ paths:
         '404':
           description: User not found
 tags:
-  - name: Authentication
-    description: API for user authentication
   - name: Class
     description: API for class information
   - name: Course
@@ -861,6 +817,5 @@ tags:
   - name: Department
     description: API for department information
   - name: Enrollment
-    description: API for managing student enrollments
   - name: User
     description: API for user information
