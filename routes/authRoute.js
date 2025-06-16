@@ -25,23 +25,43 @@ router.get(
   passport.authenticate('google', { scope: ['profile', 'email'] }),
 );
 
-// @desc: Google OAuth callback
-// @route: GET /auth/google/callback
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: Google OAuth2 callback
+ *     tags: [Authentication]
+ *     description: Handles the OAuth2 callback from Google
+ *     responses:
+ *       302:
+ *         description: Redirect on success or failure
+ */
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: '/api-docs',
-    successRedirect: '/success',
+    failureRedirect: '/auth/failure',
     session: true,
   }),
   (req, res) => {
-    // Successful authentication, redirect home or to a specific page
-    req.session.user = req.user; // Store user info in session
-    res.redirect('/');
+    // Store user in session manually for custom use
+    req.session.user = req.user;
+    res.redirect('/auth/success');
   },
 );
 
-// @desc: Auth success route
+/**
+ * @swagger
+ * /auth/success:
+ *   get:
+ *     summary: Auth success
+ *     tags: [Authentication]
+ *     description: Returns authenticated user info
+ *     responses:
+ *       200:
+ *         description: Authenticated
+ *       401:
+ *         description: Not authenticated
+ */
 router.get('/success', (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json({
@@ -63,27 +83,33 @@ router.get('/success', (req, res) => {
  *   get:
  *     summary: Logout user
  *     tags: [Authentication]
- *     description: Clears the session and invalidates the JWT token
+ *     description: Clears the session and logs the user out
  *     responses:
- *       302:
- *         description: Redirect to success page
- *       401:
- *         description: User not authenticated
+ *       200:
+ *         description: Successfully logged out
  */
-// @desc: Logout route
 router.get('/logout', (req, res) => {
   req.logout(err => {
     if (err) return res.status(500).json({ message: 'Logout failed' });
 
     req.session.destroy(() => {
       res.clearCookie('connect.sid');
-      res.json({ message: 'Logged out successfully' });
-      res.redirect('/');
+      res.status(200).json({ message: 'Logged out successfully' });
     });
   });
 });
 
-// @desc: Auth failure route
+/**
+ * @swagger
+ * /auth/failure:
+ *   get:
+ *     summary: Auth failure
+ *     tags: [Authentication]
+ *     description: Indicates failed authentication attempt
+ *     responses:
+ *       401:
+ *         description: Authentication failed
+ */
 router.get('/failure', (req, res) => {
   res.status(401).json({
     success: false,
@@ -93,27 +119,25 @@ router.get('/failure', (req, res) => {
 
 /**
  * @swagger
- * /user/protected:
+ * /auth/protected:
  *   get:
- *     summary: Test protected route with JWT
+ *     summary: Protected route with JWT
+ *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
- *     tags:
- *       - User
  *     responses:
  *       200:
- *         description: Authorized user access
+ *         description: Access granted
  *       401:
  *         description: Unauthorized
  */
-
 router.get(
   '/protected',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     res.status(200).json({
       message: 'JWT Auth Success!',
-      user: req.user, // Populated from JWT payload
+      user: req.user,
     });
   },
 );
