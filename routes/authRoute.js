@@ -62,7 +62,7 @@ router.get(
  *       401:
  *         description: Not authenticated
  */
-router.get('/success', (req, res) => {
+router.get('/auth/success', (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json({
       success: true,
