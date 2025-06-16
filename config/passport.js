@@ -2,6 +2,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const { assignRoleByEmail } = require('../utilities/roleAssigner');
 require('dotenv').config();
 
 passport.use(
@@ -14,6 +15,10 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        const email = profile.emails[0].value;
+        const role = assignRoleByEmail(email);
+
+        // Check if user already exists
         let user = await User.findOne({ email: profile.emails[0].value });
 
         if (!user) {
@@ -22,6 +27,7 @@ passport.use(
             email: profile.emails[0].value,
             password: 'OAuthUser',
             avatar: profile.photos[0].value,
+            role,
           });
         }
 

@@ -24,7 +24,6 @@ validate.userValidationRules = () => [
     .withMessage('Role is required')
     .isIn(['student', 'staff', 'admin'])
     .withMessage('Invalid role'),
-  body('refId').notEmpty().withMessage('refId is required'),
 ];
 
 validate.validateRequest = (req, res, next) => {

@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const { assignRoleByEmail } = require('../utilities/roleAssigner');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -77,17 +78,11 @@ const createUser = async (req, res) => {
       });
     }
 
-    const { name, email, password } = req.body;
+    const { name, password } = req.body;
 
     // Assign role based on domain
-    const domain = email.split('@')[1].toLowerCase();
-    let role = 'student'; // Default
-
-    if (['staff.school.com', 'teachers.school.com'].includes(domain)) {
-      role = 'staff';
-    } else if (['admin.school.com', 'superadmin.school.com'].includes(domain)) {
-      role = 'admin';
-    }
+    const email = req.body.email.toLowerCase();
+    const role = assignRoleByEmail(email);
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
