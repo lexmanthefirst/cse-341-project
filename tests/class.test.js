@@ -2,22 +2,21 @@ require('dotenv').config({ path: '.env.test' });
 const mongoose = require('mongoose');
 const request = require('supertest');
 const app = require('../app');
-const User = require('../models/userModel');
+const Class = require('../models/classModel');
 const jwt = require('jsonwebtoken');
 
 jest.setTimeout(10000);
 
-// Mock user data
-const testUser = {
-  name: 'Test User',
-  email: 'test@admin.school.com',
-  password: 'wonder123',
-  role: 'admin',
+// Mock class data
+const testClass = {
+  name: 'Test Class',
+  level: '100',
+  instructor: null,
 };
 
 // Create test token
 const token = jwt.sign(
-  { id: 'testUserId', email: testUser.email, role: testUser.role },
+  { id: 'testUserId', email: 'test@admin.school.com', role: 'admin' },
   process.env.JWT_SECRET || 'testsecret',
   { expiresIn: '1h' },
 );
@@ -37,9 +36,9 @@ beforeAll(async () => {
       serverSelectionTimeoutMS: 5000,
     });
 
-    // Clear existing data and create test user
-    await User.deleteMany({});
-    await User.create(testUser);
+    // Clear existing data and create test class
+    await Class.deleteMany({});
+    await Class.create(testClass);
   } catch (err) {
     console.error('Database connection error:', err);
     process.exit(1);
@@ -47,14 +46,14 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await User.deleteMany({});
+  await Class.deleteMany({});
   await mongoose.disconnect();
 });
 
-describe('User Routes', () => {
-  it('should get all users', async () => {
+describe('Class Routes', () => {
+  it('should get all classes', async () => {
     const res = await request(app)
-      .get('/api/user')
+      .get('/api/class')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
@@ -65,38 +64,16 @@ describe('User Routes', () => {
     expect(res.body.data.length).toBeGreaterThan(0);
   });
 
-  it('should get a user by ID', async () => {
-    const user = await User.findOne({ email: 'test@admin.school.com' });
+  it('should get a class by ID', async () => {
+    const classItem = await Class.findOne({ name: 'Test Class' });
     const res = await request(app)
-      .get(`/api/user/${user._id}`)
+      .get(`/api/class/${classItem._id}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
     // Check for proper response structure
     expect(res.body).toHaveProperty('success', true);
     expect(res.body).toHaveProperty('data');
-    expect(res.body.data).toHaveProperty('name', user.name);
-    expect(res.body.data).toHaveProperty('email', user.email);
-  });
-
-  it('should create a new user', async () => {
-    const newUser = {
-      name: 'New User',
-      email: 'newuser@admin.school.com',
-      password: 'wonder123',
-      role: 'admin',
-    };
-
-    const res = await request(app)
-      .post('/api/user')
-      .set('Authorization', `Bearer ${token}`)
-      .send(newUser);
-
-    expect(res.statusCode).toEqual(201);
-    // Check for proper response structure
-    expect(res.body).toHaveProperty('success', true);
-    expect(res.body).toHaveProperty('data');
-    expect(res.body.data).toHaveProperty('name', newUser.name);
-    expect(res.body.data).toHaveProperty('email', newUser.email);
+    expect(res.body.data).toHaveProperty('name', classItem.name);
   });
 });

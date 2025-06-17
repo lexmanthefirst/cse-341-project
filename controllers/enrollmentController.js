@@ -7,30 +7,47 @@ const enrollStudent = async (req, res) => {
   try {
     const { student, course } = req.body;
 
-    // Validate student and course exist
+    // Validate student
     const studentUser = await User.findById(student);
     if (!studentUser || studentUser.role !== 'student') {
-      return res.status(400).json({ error: 'Invalid student ID' });
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid student ID or role',
+      });
     }
 
+    // Validate course
     const courseExists = await Course.findById(course);
     if (!courseExists) {
-      return res.status(400).json({ error: 'Invalid course ID' });
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid course ID',
+      });
     }
 
-    // Check if enrollment already exists
+    // Prevent duplicate enrollment
     const existingEnrollment = await Enrollment.findOne({ student, course });
     if (existingEnrollment) {
-      return res
-        .status(400)
-        .json({ error: 'Student is already enrolled in this course' });
+      return res.status(400).json({
+        success: false,
+        error: 'Student is already enrolled in this course',
+      });
     }
 
     const newEnrollment = new Enrollment({ student, course });
     await newEnrollment.save();
-    res.status(201).json(newEnrollment);
+
+    const populated = await newEnrollment
+      .populate('student', 'name email')
+      .populate('course', 'title code');
+
+    res.status(201).json({
+      success: true,
+      message: 'Student enrolled successfully',
+      data: populated,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 };
 
@@ -40,48 +57,66 @@ const getAllEnrollments = async (req, res) => {
     const enrollments = await Enrollment.find()
       .populate('student', 'name email')
       .populate('course', 'title code');
-    res.json(enrollments);
+    res.status(200).json({
+      success: true,
+      count: enrollments.length,
+      message: 'All enrollments retrieved',
+      data: enrollments,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// Get enrollments for a specific student
+// Get all enrollments for a student
 const getStudentEnrollments = async (req, res) => {
   try {
-    const enrollments = await Enrollment.find({ student: req.params.studentId })
-      .populate('course', 'title code instructor')
-      .populate({
-        path: 'course',
-        populate: {
-          path: 'instructor',
-          select: 'name email',
-        },
-      });
-    res.json(enrollments);
+    const enrollments = await Enrollment.find({
+      student: req.params.studentId,
+    }).populate({
+      path: 'course',
+      select: 'title code instructor',
+      populate: {
+        path: 'instructor',
+        select: 'name email',
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      count: enrollments.length,
+      message: 'Student enrollments retrieved',
+      data: enrollments,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// Get enrollments for a specific course
+// Get all enrollments for a course
 const getCourseEnrollments = async (req, res) => {
   try {
     const enrollments = await Enrollment.find({
       course: req.params.courseId,
     }).populate('student', 'name email');
-    res.json(enrollments);
+
+    res.status(200).json({
+      success: true,
+      count: enrollments.length,
+      message: 'Course enrollments retrieved',
+      data: enrollments,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// Update enrollment (e.g., grade or status)
+// Update an enrollment (e.g., grade or status)
 const updateEnrollment = async (req, res) => {
   try {
     const { grade, status } = req.body;
 
-    const updatedEnrollment = await Enrollment.findByIdAndUpdate(
+    const updated = await Enrollment.findByIdAndUpdate(
       req.params.id,
       { grade, status },
       { new: true, runValidators: true },
@@ -89,30 +124,46 @@ const updateEnrollment = async (req, res) => {
       .populate('student', 'name email')
       .populate('course', 'title code');
 
-    if (!updatedEnrollment) {
-      return res.status(404).json({ error: 'Enrollment not found' });
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        error: 'Enrollment not found',
+      });
     }
-    res.json(updatedEnrollment);
+
+    res.status(200).json({
+      success: true,
+      message: 'Enrollment updated successfully',
+      data: updated,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 };
 
 // Withdraw a student from a course
 const withdrawStudent = async (req, res) => {
   try {
-    const enrollment = await Enrollment.findByIdAndUpdate(
+    const withdrawn = await Enrollment.findByIdAndUpdate(
       req.params.id,
       { status: 'withdrawn' },
       { new: true },
     );
 
-    if (!enrollment) {
-      return res.status(404).json({ error: 'Enrollment not found' });
+    if (!withdrawn) {
+      return res.status(404).json({
+        success: false,
+        error: 'Enrollment not found',
+      });
     }
-    res.json(enrollment);
+
+    res.status(200).json({
+      success: true,
+      message: 'Student withdrawn from course',
+      data: withdrawn,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 

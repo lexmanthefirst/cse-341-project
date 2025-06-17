@@ -6,18 +6,20 @@ const createClassGroup = async (req, res) => {
   try {
     const { name, level, instructor } = req.body;
 
-    // Validate class instructor is a staff user
+    // Validate instructor if provided
     if (instructor) {
       const instructorUser = await User.findById(instructor);
       if (!instructorUser || instructorUser.role !== 'staff') {
-        return res
-          .status(400)
-          .json({ error: 'Class instructor must be a staff user' });
+        return res.status(400).json({
+          success: false,
+          error: 'Class instructor must be a staff user',
+        });
       }
     }
 
     const newClass = new ClassGroup({ name, level, instructor });
     await newClass.save();
+
     res.status(201).json({
       success: true,
       message: 'Class group created successfully',
@@ -35,9 +37,14 @@ const getAllClassGroups = async (req, res) => {
       'instructor',
       'name email',
     );
-    res.json(classes);
+    res.status(200).json({
+      success: true,
+      message: 'Class groups retrieved successfully',
+      count: classes.length,
+      data: classes,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -49,11 +56,18 @@ const getClassGroup = async (req, res) => {
       'name email',
     );
     if (!classGroup) {
-      return res.status(404).json({ error: 'Class group not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Class group not found' });
     }
-    res.json(classGroup);
+
+    res.status(200).json({
+      success: true,
+      message: 'Class group retrieved successfully',
+      data: classGroup,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -65,9 +79,10 @@ const updateClassGroup = async (req, res) => {
     if (instructor) {
       const instructorUser = await User.findById(instructor);
       if (!instructorUser || instructorUser.role !== 'staff') {
-        return res
-          .status(400)
-          .json({ error: 'Class instructor must be a staff user' });
+        return res.status(400).json({
+          success: false,
+          error: 'Class instructor must be a staff user',
+        });
       }
     }
 
@@ -78,11 +93,18 @@ const updateClassGroup = async (req, res) => {
     ).populate('instructor', 'name email');
 
     if (!updatedClass) {
-      return res.status(404).json({ error: 'Class group not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Class group not found' });
     }
-    res.json(updatedClass);
+
+    res.status(200).json({
+      success: true,
+      message: 'Class group updated successfully',
+      data: updatedClass,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 };
 
@@ -91,11 +113,16 @@ const deleteClassGroup = async (req, res) => {
   try {
     const deletedClass = await ClassGroup.findByIdAndDelete(req.params.id);
     if (!deletedClass) {
-      return res.status(404).json({ error: 'Class group not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Class group not found' });
     }
-    res.json({ message: 'Class group deleted successfully' });
+    res.status(200).json({
+      success: true,
+      message: 'Class group deleted successfully',
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 

@@ -8,9 +8,13 @@ const createCourse = async (req, res) => {
       req.body;
 
     // Validate instructor is a staff user
-    const instructorUser = await User.findById(instructor);
-    if (!instructorUser || instructorUser.role !== 'staff') {
-      return res.status(400).json({ error: 'Instructor must be a staff user' });
+    if (instructor) {
+      const instructorUser = await User.findById(instructor);
+      if (!instructorUser || instructorUser.role !== 'staff') {
+        return res
+          .status(400)
+          .json({ success: false, error: 'Instructor must be a staff user' });
+      }
     }
 
     const newCourse = new Course({
@@ -20,17 +24,19 @@ const createCourse = async (req, res) => {
       instructor,
       creditUnits,
     });
-
     await newCourse.save();
 
-    const populatedCourse = await newCourse.populate(
-      'instructor',
-      'name email',
-    );
+    const populatedCourse = await newCourse
+      .populate('instructor', 'name email')
+      .populate('department', 'name');
 
-    res.status(201).json(populatedCourse);
+    res.status(201).json({
+      success: true,
+      message: 'Course created successfully',
+      data: populatedCourse,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 };
 
@@ -40,9 +46,15 @@ const getAllCourses = async (req, res) => {
     const courses = await Course.find()
       .populate('instructor', 'name email')
       .populate('department', 'name');
-    res.status(200).json(courses);
+
+    res.status(200).json({
+      success: true,
+      count: courses.length,
+      message: 'Courses retrieved successfully',
+      data: courses,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -54,12 +66,18 @@ const getCourse = async (req, res) => {
       .populate('department', 'name');
 
     if (!course) {
-      return res.status(404).json({ error: 'Course not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Course not found' });
     }
 
-    res.status(200).json(course);
+    res.status(200).json({
+      success: true,
+      message: 'Course retrieved successfully',
+      data: course,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -75,15 +93,17 @@ const updateCourse = async (req, res) => {
       isActive,
     } = req.body;
 
+    // Validate instructor role if being updated
     if (instructor) {
       const instructorUser = await User.findById(instructor);
       if (!instructorUser || instructorUser.role !== 'staff') {
         return res
           .status(400)
-          .json({ error: 'Instructor must be a staff user' });
+          .json({ success: false, error: 'Instructor must be a staff user' });
       }
     }
 
+    // Prepare only fields that are provided
     const updateFields = {
       ...(title && { title }),
       ...(description && { description }),
@@ -96,18 +116,27 @@ const updateCourse = async (req, res) => {
     const updatedCourse = await Course.findByIdAndUpdate(
       req.params.id,
       updateFields,
-      { new: true, runValidators: true },
+      {
+        new: true,
+        runValidators: true,
+      },
     )
       .populate('instructor', 'name email')
       .populate('department', 'name');
 
     if (!updatedCourse) {
-      return res.status(404).json({ error: 'Course not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Course not found' });
     }
 
-    res.status(200).json(updatedCourse);
+    res.status(200).json({
+      success: true,
+      message: 'Course updated successfully',
+      data: updatedCourse,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 };
 
@@ -116,11 +145,17 @@ const deleteCourse = async (req, res) => {
   try {
     const deletedCourse = await Course.findByIdAndDelete(req.params.id);
     if (!deletedCourse) {
-      return res.status(404).json({ error: 'Course not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Course not found' });
     }
-    res.status(200).json({ message: 'Course deleted successfully' });
+
+    res.status(200).json({
+      success: true,
+      message: 'Course deleted successfully',
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
