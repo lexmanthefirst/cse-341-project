@@ -4,7 +4,11 @@ const validateClass = {};
 
 validateClass.classGroupValidationRules = () => [
   body('name').notEmpty().withMessage('Class name is required'),
-  body('section').notEmpty().withMessage('Section is required'),
+  body('level').notEmpty().withMessage('Level is required'),
+  body('instructor')
+    .optional()
+    .isMongoId()
+    .withMessage('Instructor must be a valid MongoDB ObjectId'),
 ];
 
 validateClass.validateRequest = (req, res, next) => {
