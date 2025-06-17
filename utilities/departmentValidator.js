@@ -8,6 +8,10 @@ validateDept.departmentValidationRules = () => [
     .optional()
     .isString()
     .withMessage('Description must be a string'),
+  body('head')
+    .optional()
+    .isMongoId()
+    .withMessage('Head must be a valid MongoDB ObjectId'),
 ];
 
 validateDept.validateRequest = (req, res, next) => {
