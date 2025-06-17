@@ -7,23 +7,22 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 
 jest.setTimeout(10000);
+
 // Mock department data
 const testDepartment = {
   name: 'Test Department',
   description: 'This is a test department',
   head: null, // Will be set after creating a test user
 };
-// Create test token
+
+// Test user data
 const testUser = {
   name: 'Test User',
   email: 'testuser@example.com',
   password: 'password123',
 };
 
-// Create a test token
-const testToken = jwt.sign({ id: testUser._id }, process.env.JWT_SECRET, {
-  expiresIn: '1h',
-});
+let testToken; // Will be set after creating the user
 
 // Mock Redis client
 jest.mock('../config/redisClient', () => ({
@@ -33,6 +32,7 @@ jest.mock('../config/redisClient', () => ({
   set: jest.fn().mockResolvedValue('OK'),
   quit: jest.fn(),
 }));
+
 beforeAll(async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI_TEST, {
@@ -45,7 +45,14 @@ beforeAll(async () => {
       ...testUser,
       role: 'staff',
     });
+
+    // Set the department head to the created user's ID
     testDepartment.head = user._id;
+
+    // Create test token with the user's ID
+    testToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
 
     // Create test department
     await Department.deleteMany({});
@@ -55,6 +62,7 @@ beforeAll(async () => {
     process.exit(1);
   }
 });
+
 afterAll(async () => {
   await Department.deleteMany({});
   await User.deleteMany({});
