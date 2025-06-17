@@ -63,7 +63,7 @@ router.get('/', Util.handleErrors(departmentController.getAllDepartments));
 
 /**
  * @swagger
- * /dpeartment/{id}:
+ * /department/{id}:
  *   get:
  *     summary: Get a department by ID
  *     tags: [Department]
