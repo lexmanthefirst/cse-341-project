@@ -88,9 +88,9 @@ router.get('/:id', Util.handleErrors(departmentController.getDepartment));
 
 /**
  * @swagger
- * /deparment/{id}:
+ * /department/{id}:
  *   put:
- *     summary: Update a deparment by ID
+ *     summary: Update a department by ID
  *     tags: [Department]
  *     parameters:
  *       - in: path
