@@ -15,9 +15,13 @@ validateCourse.courseValidationRules = () => [
     .withMessage('Invalid department ID'),
   body('instructor')
     .notEmpty()
-    .withMessage('Instructor ID is required')
+    .withMessage('instructor ID is required')
     .isMongoId()
-    .withMessage('Invalid instructor ID'),
+    .withMessage('Invalid instructor ID is required'),
+  body('creditsUnits')
+    .optional()
+    .isInt({ min: 1, max: 6 })
+    .withMessage('Credits must be an integer between 1 and 6'),
 ];
 
 validateCourse.validateRequest = (req, res, next) => {

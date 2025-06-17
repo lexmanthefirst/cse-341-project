@@ -1,5 +1,6 @@
 const { body, validationResult } = require('express-validator');
 const userModel = require('../models/userModel');
+const { uniqueEmailValidator } = require('../utilities/emailValidator');
 
 const validate = {};
 
@@ -10,10 +11,7 @@ validate.userValidationRules = () => [
     .withMessage('Email is required')
     .isEmail()
     .withMessage('Invalid email')
-    .custom(async value => {
-      const existing = await userModel.findOne({ email: value });
-      if (existing) return Promise.reject('Email already in use');
-    })
+    .custom(uniqueEmailValidator(userModel))
     .normalizeEmail(),
   body('password')
     .optional()

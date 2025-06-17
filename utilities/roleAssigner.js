@@ -2,7 +2,7 @@ const domainRoleMap = [
   { pattern: /^admin\.edu$/i, role: 'admin' },
   { pattern: /^staff\.edu$/i, role: 'staff' },
   { pattern: /^student\.school\.edu$/i, role: 'student' },
-  { pattern: /^.*@gmail\.com$/i, role: 'student' }, // match full email for gmail
+  { pattern: /^.*@gmail\.com$/i, role: 'student' },
 ];
 
 function assignRoleByEmail(email) {

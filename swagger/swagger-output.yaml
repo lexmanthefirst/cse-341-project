@@ -93,9 +93,15 @@ components:
         name:
           type: string
           example: SS1 A
-        section:
+        level:
           type: string
-          example: Science
+          example: '100'
+        instructor:
+          type: string
+          format: objectId
+          description: ID of the instructor (staff user)
+          readOnly: true
+          example: 60f6e9f2b7a1c142d8ef8c12
         createdAt:
           type: string
           format: date-time
@@ -106,7 +112,8 @@ components:
           readOnly: true
       required:
         - name
-        - section
+        - level
+        - instructor
     department:
       type: object
       properties:

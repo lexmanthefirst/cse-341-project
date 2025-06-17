@@ -4,19 +4,19 @@ const User = require('../models/userModel');
 // Create a new class group
 const createClassGroup = async (req, res) => {
   try {
-    const { name, level, classTeacher } = req.body;
+    const { name, level, instructor } = req.body;
 
-    // Validate class teacher is a staff user
-    if (classTeacher) {
-      const teacher = await User.findById(classTeacher);
-      if (!teacher || teacher.role !== 'staff') {
+    // Validate class instructor is a staff user
+    if (instructor) {
+      const instructorUser = await User.findById(instructor);
+      if (!instructorUser || instructorUser.role !== 'staff') {
         return res
           .status(400)
-          .json({ error: 'Class teacher must be a staff user' });
+          .json({ error: 'Class instructor must be a staff user' });
       }
     }
 
-    const newClass = new ClassGroup({ name, level, classTeacher });
+    const newClass = new ClassGroup({ name, level, instructor });
     await newClass.save();
     res.status(201).json({
       success: true,
@@ -32,7 +32,7 @@ const createClassGroup = async (req, res) => {
 const getAllClassGroups = async (req, res) => {
   try {
     const classes = await ClassGroup.find().populate(
-      'classTeacher',
+      'instructor',
       'name email',
     );
     res.json(classes);
@@ -45,7 +45,7 @@ const getAllClassGroups = async (req, res) => {
 const getClassGroup = async (req, res) => {
   try {
     const classGroup = await ClassGroup.findById(req.params.id).populate(
-      'classTeacher',
+      'instructor',
       'name email',
     );
     if (!classGroup) {
@@ -60,22 +60,22 @@ const getClassGroup = async (req, res) => {
 // Update a class group
 const updateClassGroup = async (req, res) => {
   try {
-    const { name, level, classTeacher } = req.body;
+    const { name, level, instructor } = req.body;
 
-    if (classTeacher) {
-      const teacher = await User.findById(classTeacher);
-      if (!teacher || teacher.role !== 'staff') {
+    if (instructor) {
+      const instructorUser = await User.findById(instructor);
+      if (!instructorUser || instructorUser.role !== 'staff') {
         return res
           .status(400)
-          .json({ error: 'Class teacher must be a staff user' });
+          .json({ error: 'Class instructor must be a staff user' });
       }
     }
 
     const updatedClass = await ClassGroup.findByIdAndUpdate(
       req.params.id,
-      { name, level, classTeacher },
+      { name, level, instructor },
       { new: true, runValidators: true },
-    ).populate('classTeacher', 'name email');
+    ).populate('instructor', 'name email');
 
     if (!updatedClass) {
       return res.status(404).json({ error: 'Class group not found' });

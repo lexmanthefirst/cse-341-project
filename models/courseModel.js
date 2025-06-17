@@ -9,16 +9,21 @@ const courseSchema = new Schema(
       required: true,
       trim: true,
     },
-    code: {
+    description: {
       type: String,
       required: true,
       unique: true,
       uppercase: true,
     },
-    description: String,
-    teacher: {
+    department: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // User with role === 'staff'
+      ref: 'Department',
+      required: true,
+    },
+    description: String,
+    instructor: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     creditUnits: {

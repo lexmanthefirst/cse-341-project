@@ -4,7 +4,7 @@ const User = require('../models/userModel');
 // Create a new department
 const createDepartment = async (req, res) => {
   try {
-    const { name, code, head } = req.body;
+    const { name, description, head } = req.body;
 
     if (head) {
       const headUser = await User.findById(head);
@@ -15,7 +15,7 @@ const createDepartment = async (req, res) => {
       }
     }
 
-    const newDepartment = new Department({ name, code, head });
+    const newDepartment = new Department({ name, description, head });
     await newDepartment.save();
     res.status(201).json(newDepartment);
   } catch (error) {
@@ -52,7 +52,7 @@ const getDepartment = async (req, res) => {
 // Update a department
 const updateDepartment = async (req, res) => {
   try {
-    const { name, code, head } = req.body;
+    const { name, description, head } = req.body;
 
     if (head) {
       const headUser = await User.findById(head);
@@ -65,7 +65,7 @@ const updateDepartment = async (req, res) => {
 
     const updatedDepartment = await Department.findByIdAndUpdate(
       req.params.id,
-      { name, code, head },
+      { name, description, head },
       { new: true, runValidators: true },
     ).populate('head', 'name email');
 

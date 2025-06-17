@@ -50,11 +50,11 @@ const getAllEnrollments = async (req, res) => {
 const getStudentEnrollments = async (req, res) => {
   try {
     const enrollments = await Enrollment.find({ student: req.params.studentId })
-      .populate('course', 'title code teacher')
+      .populate('course', 'title code instructor')
       .populate({
         path: 'course',
         populate: {
-          path: 'teacher',
+          path: 'instructor',
           select: 'name email',
         },
       });

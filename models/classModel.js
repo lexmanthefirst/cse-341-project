@@ -11,10 +11,22 @@ const classGroupSchema = new Schema(
     },
     level: {
       type: String,
-      enum: ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'],
+      enum: [
+        '100',
+        '200',
+        '300',
+        '400',
+        '500',
+        'SS1',
+        'SS2',
+        'SS3',
+        'JSS1',
+        'JS2',
+        'JS3',
+      ],
       required: true,
     },
-    classTeacher: {
+    instructor: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: false,
