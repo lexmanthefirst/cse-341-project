@@ -504,7 +504,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/department'
-  /dpeartment/{id}:
+  /department/{id}:
     get:
       summary: Get a department by ID
       tags:
@@ -525,9 +525,8 @@ paths:
                 $ref: '#/components/schemas/department'
         '404':
           description: User not found
-  /deparment/{id}:
     put:
-      summary: Update a deparment by ID
+      summary: Update a department by ID
       tags:
         - Department
       parameters:
@@ -554,7 +553,6 @@ paths:
           description: Invalid input
         '404':
           description: Department not found
-  /department/{id}:
     delete:
       summary: Delete a department member by ID
       tags:

@@ -3,3 +3,5 @@ package-lock.yaml
 .env
 .env.test
 package-lock.json
+coverage
+
