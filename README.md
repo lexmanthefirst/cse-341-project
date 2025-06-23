@@ -1,6 +1,6 @@
 # School Management API
 
-A RESTful API built with **Node.js**, **Express**, and **MongoDB (MongoClient)** for managing students, staff, departments, courses, and enrollments with full authentication, role-based access control, and Swagger documentation.
+A RESTful API built with **Node.js**, **Express**, and **MongoDB (Mongoose)** for managing students, staff, departments, courses, and enrollments with full authentication, role-based access control, and Swagger documentation.
 
 ---
 
